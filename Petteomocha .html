@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ PETTEOMOCHA ✨ - Mini Games</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            color: #00ff00;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Animated 90s background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    #ff00ff 0px,
+                    #ff00ff 2px,
+                    transparent 2px,
+                    transparent 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    #00ffff 0px,
+                    #00ffff 2px,
+                    transparent 2px,
+                    transparent 4px
+                ),
+                linear-gradient(180deg, #1a0033 0%, #000033 50%, #001a1a 100%);
+            opacity: 0.3;
+            animation: bgScroll 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes bgScroll {
+            0% { background-position: 0 0, 0 0, 0 0; }
+            100% { background-position: 100px 100px, 100px 100px, 0 0; }
+        }
+
+        /* Scanlines effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .game-container {
+            background: #1a1a2e;
+            border: 8px outset #666;
+            box-shadow: 
+                0 0 0 4px #000,
+                0 0 20px rgba(0, 255, 255, 0.5),
+                0 0 40px rgba(255, 0, 255, 0.3),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+            max-width: 1000px;
+            width: 100%;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        /* Corner decorations */
+        .game-container::before,
+        .game-container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #00ff00;
+            z-index: 10;
+        }
+
+        .game-container::before {
+            top: -8px;
+            left: -8px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .game-container::after {
+            bottom: -8px;
+            right: -8px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .game-header {
+            background: linear-gradient(180deg, #ff00ff 0%, #660066 100%);
+            padding: 25px;
+            text-align: center;
+            color: #fff;
+            border-bottom: 4px solid #00ff00;
+            position: relative;
+            box-shadow: inset 0 -4px 0 rgba(0, 255, 0, 0.3);
+        }
+
+        .game-header::before {
+            content: '★ ★ ★ ★ ★';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5em;
+            color: #ffff00;
+            animation: starBlink 2s infinite;
+        }
+
+        @keyframes starBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .game-header h1 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-shadow: 
+                3px 3px 0 #000,
+                -1px -1px 0 #00ffff,
+                0 0 20px #ff00ff;
+            animation: glitch 3s infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-2px, -2px); }
+            98% { transform: translate(2px, 2px); }
+        }
+
+        .pet-info {
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.5em;
+            margin-top: 15px;
+            text-shadow: 2px 2px 0 #000;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pet-info span {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 15px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .menu-buttons {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 0;
+            background: #0f0f1e;
+        }
+
+        .pet-display {
+            background: 
+                linear-gradient(45deg, transparent 48%, #00ff00 48%, #00ff00 52%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, #00ff00 48%, #00ff00 52%, transparent 52%),
+                #1a1a3e;
+            background-size: 20px 20px, 20px 20px, 100% 100%;
+            background-position: 0 0, 10px 10px, 0 0;
+            border-right: 4px solid #00ffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 600px;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .canvas-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #petCanvas {
+            border: 4px ridge #666;
+            background: #000;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.5),
+                inset 0 0 30px rgba(0, 255, 255, 0.2);
+            image-rendering: pixelated;
+        }
+
+        .mood-display {
+            background: #000;
+            color: #00ff00;
+            padding: 10px 20px;
+            border: 3px solid #00ff00;
+            font-size: 0.6em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 0, 0.8),
+                inset 0 0 10px rgba(0, 255, 0, 0.3);
+            text-shadow: 0 0 5px #00ff00;
+            animation: pulse 2s infinite;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.8), inset 0 0 10px rgba(0, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 0, 1), inset 0 0 15px rgba(0, 255, 0, 0.5); }
+        }
+
+        .time-display {
+            font-size: 0.5em;
+            color: #ffff00;
+            text-shadow: 0 0 5px #ffff00;
+            background: #000;
+            padding: 8px 15px;
+            border: 2px solid #ffff00;
+            margin-top: 15px;
+        }
+
+        .stats-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            background: #0f0f1e;
+            padding: 20px;
+        }
+
+        .stat-group {
+            background: #1a1a3e;
+            padding: 18px;
+            border: 4px solid #666;
+            border-style: ridge;
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-group h3 {
+            margin-bottom: 15px;
+            color: #ff00ff;
+            font-size: 0.7em;
+            text-shadow: 
+                2px 2px 0 #000,
+                0 0 10px #ff00ff;
+            border-bottom: 2px solid #ff00ff;
+            padding-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .stat-item {
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.5em;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .stat-bar {
+            background: #000;
+            height: 18px;
+            border: 3px inset #666;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            position: relative;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* Pixelated gradient effect */
+        .stat-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-fill.hunger { background: #ff0000; }
+        .stat-fill.energy { background: #ffff00; }
+        .stat-fill.happiness { background: #ff00ff; }
+        .stat-fill.hygiene { background: #00ffff; }
+        .stat-fill.social { background: #00ff00; }
+        .stat-fill.curiosity { background: #ff6600; }
+
+        .actions-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: #000;
+            color: #fff;
+            border: 4px outset #666;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-size: 0.55em;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.1s;
+            box-shadow: 
+                0 4px 0 #333,
+                0 0 10px rgba(0, 255, 255, 0.3);
+            text-shadow: 2px 2px 0 #000;
+            position: relative;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 0 #333,
+                0 0 20px currentColor;
+        }
+
+        .action-btn:active {
+            transform: translateY(2px);
+            border-style: inset;
+            box-shadow: 
+                0 2px 0 #333,
+                inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        .action-btn.feed { color: #ff0000; }
+        .action-btn.play { color: #ff00ff; }
+        .action-btn.clean { color: #00ffff; }
+        .action-btn.sleep { color: #ffff00; }
+        .action-btn.talk { color: #00ff00; }
+        .action-btn.train { color: #ff6600; }
+
+        .chat-panel {
+            background: #000;
+            padding: 15px;
+            border: 4px inset #666;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 0.5em;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Custom scrollbar */
+        .chat-panel::-webkit-scrollbar {
+            width: 16px;
+        }
+
+        .chat-panel::-webkit-scrollbar-track {
+            background: #000;
+            border: 2px inset #666;
+        }
+
+        .chat-panel::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border: 2px outset #666;
+            box-shadow: 0 0 5px #00ff00;
+        }
+
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            animation: slideIn 0.3s ease;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+            line-height: 1.8;
+            word-wrap: break-word;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .chat-message.pet {
+            border-color: #00ffff;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .chat-message.system {
+            border-color: #ffff00;
+            color: #ffff00;
+            text-shadow: 0 0 5px #ffff00;
+            background: rgba(255, 255, 0, 0.1);
+            text-align: center;
+            font-style: italic;
+        }
+
+        .evolution-badge {
+            background: #000;
+            color: #ffff00;
+            padding: 10px 20px;
+            border: 3px solid #ffff00;
+            font-size: 0.55em;
+            display: inline-block;
+            margin-top: 15px;
+            box-shadow: 
+                0 0 10px rgba(255, 255, 0, 0.8),
+                inset 0 0 10px rgba(255, 255, 0, 0.2);
+            text-shadow: 0 0 5px #ffff00;
+            animation: badge-glow 2s infinite alternate;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        @keyframes badge-glow {
+            from { box-shadow: 0 0 10px rgba(255, 255, 0, 0.8), inset 0 0 10px rgba(255, 255, 0, 0.2); }
+            to { box-shadow: 0 0 20px rgba(255, 255, 0, 1), inset 0 0 15px rgba(255, 255, 0, 0.4); }
+        }
+
+        .personality-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .trait-badge {
+            background: #000;
+            padding: 6px 12px;
+            border: 2px solid #ff00ff;
+            font-size: 0.45em;
+            color: #ff00ff;
+            text-shadow: 0 0 5px #ff00ff;
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: #1a1a3e;
+            padding: 30px;
+            border: 8px ridge #666;
+            max-width: 600px;
+            text-align: center;
+            animation: modalPop 0.3s ease;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.5),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: scale(0.5) rotate(-5deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1) rotate(2deg);
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: #ff00ff;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            text-shadow: 
+                2px 2px 0 #000,
+                0 0 20px #ff00ff;
+        }
+
+        .modal-content p {
+            color: #00ffff;
+            font-size: 0.6em;
+            line-height: 1.8;
+            margin: 20px 0;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .modal-content div {
+            text-align: left;
+            color: #00ff00;
+            font-size: 0.55em;
+            line-height: 2;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .menu-btn {
+            background: #000;
+            border: 3px outset #666;
+            padding: 10px 18px;
+            cursor: pointer;
+            color: #00ff00;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5em;
+            margin: 0 5px;
+            text-shadow: 0 0 5px #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            transition: all 0.1s;
+        }
+
+        .menu-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .menu-btn:active {
+            border-style: inset;
+            transform: translateY(0);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #000;
+            color: #ff0000;
+            padding: 15px 25px;
+            border: 4px solid #ff0000;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 0, 0.8),
+                inset 0 0 20px rgba(255, 0, 0, 0.2);
+            animation: notificationSlide 0.3s ease, notificationBlink 0.5s infinite;
+            z-index: 2000;
+            max-width: 300px;
+            font-size: 0.6em;
+            text-shadow: 0 0 5px #ff0000;
+            line-height: 1.6;
+        }
+
+        @keyframes notificationSlide {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes notificationBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .critical {
+            color: #ff0000;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff0000;
+            animation: critical-blink 0.5s infinite;
+        }
+
+        @keyframes critical-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Mini-games styles */
+        .mini-games-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .mini-game-btn {
+            background: #000;
+            color: #fff;
+            border: 4px outset #666;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-size: 0.55em;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.1s;
+            box-shadow: 
+                0 4px 0 #333,
+                0 0 10px rgba(0, 255, 255, 0.3);
+            text-shadow: 2px 2px 0 #000;
+            position: relative;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .mini-game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 0 #333,
+                0 0 20px currentColor;
+        }
+
+        .mini-game-btn:active {
+            transform: translateY(2px);
+            border-style: inset;
+            box-shadow: 
+                0 2px 0 #333,
+                inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .mini-game-btn.memory { color: #6c5ce7; }
+        .mini-game-btn.reaction { color: #ffff00; }
+        .mini-game-btn.maze { color: #ff6600; }
+        .mini-game-btn.rhythm { color: #ff00ff; }
+
+        /* Game containers */
+        .game-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        .game-content {
+            background: #1a1a3e;
+            padding: 30px;
+            border: 8px ridge #666;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.5),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .game-title {
+            color: #ff00ff;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            text-shadow: 
+                2px 2px 0 #000,
+                0 0 20px #ff00ff;
+        }
+
+        .game-instructions {
+            color: #00ffff;
+            font-size: 0.6em;
+            line-height: 1.8;
+            margin: 20px 0;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .game-area {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.6em;
+            color: #00ff00;
+        }
+
+        /* Memory Game Styles */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .memory-card {
+            width: 80px;
+            height: 80px;
+            background: #333;
+            border: 3px outset #666;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+            background: #6c5ce7;
+        }
+
+        .memory-card.matched {
+            background: #00ff00;
+            cursor: default;
+        }
+
+        /* Reaction Game Styles */
+        .reaction-target {
+            width: 100px;
+            height: 100px;
+            background: #ffff00;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 20px #ffff00;
+            transition: transform 0.1s;
+        }
+
+        .reaction-target:active {
+            transform: scale(0.9);
+        }
+
+        /* Maze Game Styles */
+        .maze-container {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+            gap: 2px;
+            background: #333;
+            padding: 5px;
+        }
+
+        .maze-cell {
+            width: 30px;
+            height: 30px;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .maze-cell.wall {
+            background: #ff6600;
+        }
+
+        .maze-cell.path {
+            background: #000;
+        }
+
+        .maze-cell.player {
+            background: #00ff00;
+        }
+
+        .maze-cell.exit {
+            background: #ff00ff;
+        }
+
+        /* Rhythm Game Styles */
+        .rhythm-track {
+            width: 400px;
+            height: 200px;
+            background: #000;
+            border: 3px inset #666;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rhythm-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #ff00ff;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .rhythm-note {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #00ffff;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .rhythm-hit-area {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 0, 0.3);
+            border: 3px solid #ffff00;
+            border-radius: 50%;
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            box-shadow: 0 0 20px #ffff00;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 900px) {
+            body {
+                padding: 10px;
+                font-size: 14px;
+                align-items: flex-start;
+                padding-top: 10px;
+                padding-bottom: 40px;
+            }
+            
+            .game-container {
+                border-width: 6px;
+                margin: 0 auto 20px;
+            }
+            
+            .game-header {
+                padding: 15px;
+            }
+            
+            .game-header h1 {
+                font-size: 1.2em;
+                line-height: 1.4;
+            }
+            
+            .game-header::before {
+                font-size: 0.4em;
+            }
+            
+            .pet-info {
+                flex-direction: column;
+                gap: 8px;
+                font-size: 0.45em;
+            }
+            
+            .pet-info span {
+                padding: 6px 12px;
+            }
+            
+            .menu-buttons {
+                gap: 8px;
+            }
+            
+            .menu-btn {
+                font-size: 0.45em;
+                padding: 8px 12px;
+                margin: 0;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .pet-display {
+                border-right: none;
+                border-bottom: 4px solid #00ffff;
+                min-height: 400px;
+                padding: 15px;
+            }
+            
+            #petCanvas {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .mood-display {
+                font-size: 0.55em;
+                padding: 8px 16px;
+                min-width: 180px;
+            }
+            
+            .evolution-badge {
+                font-size: 0.5em;
+                padding: 8px 16px;
+                margin-top: 12px;
+            }
+            
+            .trait-badge {
+                font-size: 0.4em;
+                padding: 5px 10px;
+            }
+            
+            .time-display {
+                font-size: 0.45em;
+                padding: 6px 12px;
+            }
+            
+            .stats-panel {
+                gap: 15px;
+            }
+            
+            .stat-group {
+                padding: 15px;
+                border-width: 3px;
+            }
+            
+            .stat-group h3 {
+                font-size: 0.65em;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+            }
+            
+            .stat-item {
+                margin-bottom: 12px;
+            }
+            
+            .stat-label {
+                font-size: 0.48em;
+                margin-bottom: 5px;
+            }
+            
+            .stat-bar {
+                height: 16px;
+                border-width: 2px;
+            }
+            
+            .actions-panel {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .action-btn {
+                font-size: 0.5em;
+                padding: 12px 8px;
+                border-width: 3px;
+                line-height: 1.5;
+            }
+            
+            .chat-panel {
+                font-size: 0.48em;
+                padding: 12px;
+                max-height: 180px;
+                border-width: 3px;
+            }
+            
+            .chat-message {
+                margin-bottom: 10px;
+                padding: 8px;
+                line-height: 1.6;
+            }
+            
+            .modal-content {
+                padding: 25px;
+                margin: 0 15px;
+                max-width: calc(100% - 30px);
+                border-width: 6px;
+            }
+            
+            .modal-content h2 {
+                font-size: 1em;
+                margin-bottom: 15px;
+            }
+            
+            .modal-content p,
+            .modal-content div {
+                font-size: 0.55em;
+                line-height: 1.7;
+            }
+            
+            .notification {
+                font-size: 0.55em;
+                padding: 12px 20px;
+                max-width: 250px;
+                top: 10px;
+                right: 10px;
+                border-width: 3px;
+            }
+            
+            /* Mini-games responsive */
+            .mini-games-panel {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .mini-game-btn {
+                font-size: 0.5em;
+                padding: 12px 8px;
+                border-width: 3px;
+                line-height: 1.5;
+            }
+            
+            .game-content {
+                padding: 25px;
+                margin: 0 15px;
+                max-width: calc(100% - 30px);
+                border-width: 6px;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .memory-card {
+                width: 60px;
+                height: 60px;
+                font-size: 1.2em;
+            }
+            
+            .maze-container {
+                grid-template-columns: repeat(10, 25px);
+                grid-template-rows: repeat(10, 25px);
+            }
+            
+            .maze-cell {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .rhythm-track {
+                width: 300px;
+                height: 150px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                font-size: 12px;
+                padding-bottom: 60px;
+            }
+            
+            .game-header h1 {
+                font-size: 1em;
+            }
+            
+            .pet-info {
+                font-size: 0.4em;
+            }
+            
+            .menu-btn {
+                font-size: 0.4em;
+                padding: 6px 10px;
+            }
+            
+            #petCanvas {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .actions-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-btn {
+                font-size: 0.45em;
+                padding: 10px 6px;
+            }
+            
+            .mini-games-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .mini-game-btn {
+                font-size: 0.45em;
+                padding: 10px 6px;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+            
+            .memory-card {
+                width: 50px;
+                height: 50px;
+                font-size: 1em;
+            }
+            
+            .maze-container {
+                grid-template-columns: repeat(10, 20px);
+                grid-template-rows: repeat(10, 20px);
+            }
+            
+            .maze-cell {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .rhythm-track {
+                width: 250px;
+                height: 120px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            body {
+                padding: 5px;
+                padding-bottom: 80px;
+                font-size: 11px;
+            }
+            
+            .game-container {
+                border-width: 4px;
+            }
+            
+            .game-header h1 {
+                font-size: 0.9em;
+            }
+            
+            .pet-info {
+                font-size: 0.38em;
+            }
+            
+            .menu-btn {
+                font-size: 0.38em;
+                padding: 5px 8px;
+            }
+            
+            #petCanvas {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .stat-group {
+                padding: 12px;
+            }
+            
+            .actions-panel {
+                gap: 8px;
+            }
+            
+            .action-btn {
+                font-size: 0.42em;
+                padding: 8px 4px;
+            }
+            
+            .mini-games-panel {
+                gap: 8px;
+            }
+            
+            .mini-game-btn {
+                font-size: 0.42em;
+                padding: 8px 4px;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
+            }
+            
+            .memory-card {
+                width: 45px;
+                height: 45px;
+                font-size: 0.9em;
+            }
+            
+            .maze-container {
+                grid-template-columns: repeat(10, 18px);
+                grid-template-rows: repeat(10, 18px);
+            }
+            
+            .maze-cell {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .rhythm-track {
+                width: 220px;
+                height: 100px;
+            }
+        }
+        
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .action-btn,
+            .menu-btn,
+            .mini-game-btn {
+                padding: 14px 12px;
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .action-btn:active,
+            .menu-btn:active,
+            .mini-game-btn:active {
+                transform: scale(0.95);
+            }
+            
+            .memory-card {
+                min-height: 60px;
+                min-width: 60px;
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-width: 900px) and (orientation: landscape) {
+            .main-content {
+                grid-template-columns: 250px 1fr;
+            }
+            
+            .pet-display {
+                border-right: 4px solid #00ffff;
+                border-bottom: none;
+                min-height: auto;
+            }
+            
+            #petCanvas {
+                width: 180px;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🐾 PETTEOMOCHA 🐾</h1>
+            <div class="pet-info">
+                <span id="petName">LOADING...</span>
+                <span id="petAge">AGE: 0 DAYS</span>
+                <span id="petStage">EGG</span>
+            </div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="game.saveGame()">💾 SAVE</button>
+                <button class="menu-btn" onclick="game.showStats()">📊 STATS</button>
+                <button class="menu-btn" onclick="game.resetGame()">🔄 NEW PET</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="pet-display">
+                <div class="canvas-container">
+                    <canvas id="petCanvas" width="240" height="240"></canvas>
+                </div>
+                <div class="mood-display" id="moodDisplay">😊 HAPPY</div>
+                <div class="evolution-badge" id="evolutionBadge">EGG STAGE</div>
+                <div class="personality-traits" id="personalityTraits"></div>
+                <div class="time-display" id="timeDisplay">DAY • 12:00 PM</div>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-group">
+                    <h3>PRIMARY NEEDS</h3>
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>🍖 HUNGER</span>
+                            <span id="hungerValue">100</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill hunger" id="hungerBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>⚡ ENERGY</span>
+                            <span id="energyValue">100</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill energy" id="energyBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>💖 HAPPINESS</span>
+                            <span id="happinessValue">100</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill happiness" id="happinessBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>🛁 HYGIENE</span>
+                            <span id="hygieneValue">100</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill hygiene" id="hygieneBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>👥 SOCIAL</span>
+                            <span id="socialValue">100</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill social" id="socialBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>🔍 CURIOSITY</span>
+                            <span id="curiosityValue">100</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill curiosity" id="curiosityBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-group">
+                    <h3>ACTIONS</h3>
+                    <div class="actions-panel">
+                        <button class="action-btn feed" onclick="game.feed()">🍖<br>FEED</button>
+                        <button class="action-btn play" onclick="game.play()">🎮<br>PLAY</button>
+                        <button class="action-btn clean" onclick="game.clean()">🛁<br>CLEAN</button>
+                        <button class="action-btn sleep" onclick="game.sleep()">😴<br>SLEEP</button>
+                        <button class="action-btn talk" onclick="game.talk()">💬<br>TALK</button>
+                        <button class="action-btn train" onclick="game.train()">🎯<br>TRAIN</button>
+                    </div>
+                </div>
+
+                <div class="stat-group">
+                    <h3>MINI-GAMES</h3>
+                    <div class="mini-games-panel">
+                        <button class="mini-game-btn memory" onclick="game.startMemoryGame()">🧠<br>MEMORY</button>
+                        <button class="mini-game-btn reaction" onclick="game.startReactionGame()">⚡<br>REACTION</button>
+                        <button class="mini-game-btn maze" onclick="game.startMazeGame()">🔍<br>MAZE</button>
+                        <button class="mini-game-btn rhythm" onclick="game.startRhythmGame()">🎵<br>RHYTHM</button>
+                    </div>
+                </div>
+
+                <div class="stat-group">
+                    <h3>CHAT LOG</h3>
+                    <div class="chat-panel" id="chatPanel">
+                        <div class="chat-message system">YOUR PET WILL TALK TO YOU HERE!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content" id="modalContent">
+            <h2>MODAL TITLE</h2>
+            <p>Modal content</p>
+            <button class="action-btn" onclick="game.closeModal()">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- Mini-Games Screens -->
+    <div id="memoryGame" class="game-screen">
+        <div class="game-content">
+            <h2 class="game-title">MEMORY MATCH</h2>
+            <p class="game-instructions">Match pairs of cards to boost Intelligence! Find all pairs before time runs out.</p>
+            <div class="game-stats">
+                <div>Time: <span id="memoryTime">60</span>s</div>
+                <div>Pairs: <span id="memoryPairs">0</span>/8</div>
+                <div>Score: <span id="memoryScore">0</span></div>
+            </div>
+            <div class="game-area">
+                <div class="memory-grid" id="memoryGrid"></div>
+            </div>
+            <button class="action-btn" onclick="game.closeMiniGame()">EXIT</button>
+        </div>
+    </div>
+
+    <div id="reactionGame" class="game-screen">
+        <div class="game-content">
+            <h2 class="game-title">REACTION TEST</h2>
+            <p class="game-instructions">Click the target as fast as you can to boost Energy! You have 30 seconds.</p>
+            <div class="game-stats">
+                <div>Time: <span id="reactionTime">30</span>s</div>
+                <div>Clicks: <span id="reactionClicks">0</span></div>
+                <div>Score: <span id="reactionScore">0</span></div>
+            </div>
+            <div class="game-area">
+                <div class="reaction-target" id="reactionTarget"></div>
+            </div>
+            <button class="action-btn" onclick="game.closeMiniGame()">EXIT</button>
+        </div>
+    </div>
+
+    <div id="mazeGame" class="game-screen">
+        <div class="game-content">
+            <h2 class="game-title">MAZE RUNNER</h2>
+            <p class="game-instructions">Navigate the maze to boost Curiosity! Use arrow keys to move.</p>
+            <div class="game-stats">
+                <div>Time: <span id="mazeTime">90</span>s</div>
+                <div>Moves: <span id="mazeMoves">0</span></div>
+            </div>
+            <div class="game-area">
+                <div class="maze-container" id="mazeContainer"></div>
+            </div>
+            <button class="action-btn" onclick="game.closeMiniGame()">EXIT</button>
+        </div>
+    </div>
+
+    <div id="rhythmGame" class="game-screen">
+        <div class="game-content">
+            <h2 class="game-title">RHYTHM MASTER</h2>
+            <p class="game-instructions">Press SPACE when notes cross the line to boost Creativity! Follow the beat.</p>
+            <div class="game-stats">
+                <div>Time: <span id="rhythmTime">45</span>s</div>
+                <div>Score: <span id="rhythmScore">0</span></div>
+                <div>Combo: <span id="rhythmCombo">0</span>x</div>
+            </div>
+            <div class="game-area">
+                <div class="rhythm-track" id="rhythmTrack">
+                    <div class="rhythm-line"></div>
+                    <div class="rhythm-hit-area"></div>
+                </div>
+            </div>
+            <button class="action-btn" onclick="game.closeMiniGame()">EXIT</button>
+        </div>
+    </div>
+
+    <script>
+        class Pet {
+            constructor() {
+                this.name = "PETTEO";
+                this.stage = "egg";
+                this.age = 0;
+                this.born = Date.now();
+                
+                this.hunger = 100;
+                this.energy = 100;
+                this.happiness = 100;
+                this.hygiene = 100;
+                this.social = 100;
+                this.curiosity = 100;
+                
+                this.discipline = 50;
+                this.affection = 50;
+                this.intelligence = 50;
+                this.creativity = 50;
+                this.independence = 50;
+                
+                this.mood = "happy";
+                this.isSleeping = false;
+                this.isSick = false;
+                this.evolutionPath = null;
+                this.evolutionForm = null;
+                
+                this.traits = this.generateTraits();
+                this.animationFrame = 0;
+                this.animationSpeed = 0.1;
+            }
+            
+            generateTraits() {
+                const allTraits = [
+                    "LAZY", "ENERGETIC", "PICKY EATER", "FOODIE", 
+                    "NEAT FREAK", "SOCIAL BUTTERFLY", "LONER", "CURIOUS",
+                    "STUBBORN", "SENSITIVE"
+                ];
+                const shuffled = allTraits.sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, 3);
+            }
+            
+            hasTrait(trait) {
+                return this.traits.includes(trait);
+            }
+            
+            updateAge() {
+                const daysPassed = Math.floor((Date.now() - this.born) / (1000 * 60 * 60 * 24));
+                this.age = daysPassed;
+                
+                if (this.age === 0 && this.stage === "egg") this.stage = "egg";
+                else if (this.age >= 1 && this.age < 3 && this.stage === "egg") {
+                    this.stage = "baby";
+                    game.addMessage("YOUR EGG HATCHED! 🐣");
+                    game.showModal("CONGRATULATIONS!", "YOUR PETTEOMOCHA HAS HATCHED INTO A BABY!");
+                }
+                else if (this.age >= 3 && this.age < 7 && ["egg", "baby"].includes(this.stage)) {
+                    this.stage = "child";
+                    game.addMessage("I'M GROWING UP! 🌟");
+                }
+                else if (this.age >= 7 && this.age < 14 && ["egg", "baby", "child"].includes(this.stage)) {
+                    this.stage = "teen";
+                    this.determineEvolutionPath();
+                    game.addMessage("I'M A TEENAGER NOW! 🎉");
+                }
+                else if (this.age >= 14 && ["egg", "baby", "child", "teen"].includes(this.stage)) {
+                    this.stage = "adult";
+                    this.determineEvolutionForm();
+                    game.addMessage(`I EVOLVED INTO ${this.evolutionForm}! ✨`);
+                    game.showModal("EVOLUTION!", `YOUR PET HAS EVOLVED INTO ${this.evolutionForm}!`);
+                }
+            }
+            
+            determineEvolutionPath() {
+                const avgCare = (this.hunger + this.energy + this.happiness + this.hygiene) / 4;
+                
+                if (avgCare < 40) this.evolutionPath = "NEGLECT";
+                else if (this.discipline > 70) this.evolutionPath = "INTELLECTUAL";
+                else if (this.happiness > 80 && this.social > 70) this.evolutionPath = "ACTIVE";
+                else if (this.affection > 80) this.evolutionPath = "DOTING";
+                else this.evolutionPath = "BALANCED";
+            }
+            
+            determineEvolutionForm() {
+                if (this.discipline > 70 && this.intelligence > 70) {
+                    this.evolutionForm = "SCHOLAR";
+                } else if (this.happiness > 80 && this.social > 70) {
+                    this.evolutionForm = "SOCIAL BUTTERFLY";
+                } else if (this.independence > 70 && this.curiosity > 70) {
+                    this.evolutionForm = "ADVENTURER";
+                } else if (this.affection > 80 && this.creativity > 70) {
+                    this.evolutionForm = "ARTIST";
+                } else if (this.discipline < 30 && this.affection < 30) {
+                    this.evolutionForm = "MYSTERIOUS";
+                } else {
+                    this.evolutionForm = "HARMONIOUS";
+                }
+            }
+            
+            updateMood() {
+                if (this.isSick) {
+                    this.mood = "sick";
+                } else if (this.isSleeping) {
+                    this.mood = "sleeping";
+                } else if (this.energy < 20) {
+                    this.mood = "tired";
+                } else if (this.hunger < 20) {
+                    this.mood = "hungry";
+                } else if (this.happiness < 30) {
+                    this.mood = "sad";
+                } else if (this.hygiene < 20) {
+                    this.mood = "dirty";
+                } else if (this.social < 30) {
+                    this.mood = "lonely";
+                } else if (this.happiness > 80 && this.energy > 60) {
+                    this.mood = "excited";
+                } else if (this.curiosity > 80) {
+                    this.mood = "playful";
+                } else {
+                    this.mood = "happy";
+                }
+            }
+            
+            decay() {
+                let hungerDecay = 0.05;
+                let energyDecay = 0.03;
+                let happinessDecay = 0.02;
+                let hygieneDecay = 0.015;
+                let socialDecay = 0.01;
+                let curiosityDecay = 0.005;
+                
+                const stageMultipliers = {
+                    egg: 0.5,
+                    baby: 1.5,
+                    child: 1.2,
+                    teen: 1.0,
+                    adult: 0.8
+                };
+                
+                const multiplier = stageMultipliers[this.stage] || 1.0;
+                
+                if (this.hasTrait("LAZY")) energyDecay *= 0.7;
+                if (this.hasTrait("ENERGETIC")) energyDecay *= 1.3;
+                if (this.hasTrait("PICKY EATER")) hungerDecay *= 1.2;
+                if (this.hasTrait("NEAT FREAK")) hygieneDecay *= 1.5;
+                if (this.hasTrait("SOCIAL BUTTERFLY")) socialDecay *= 1.4;
+                if (this.hasTrait("LONER")) socialDecay *= 0.6;
+                if (this.hasTrait("CURIOUS")) curiosityDecay *= 1.5;
+                
+                if (!this.isSleeping) {
+                    this.hunger = Math.max(0, this.hunger - hungerDecay * multiplier);
+                    this.energy = Math.max(0, this.energy - energyDecay * multiplier);
+                    this.happiness = Math.max(0, this.happiness - happinessDecay * multiplier);
+                    this.hygiene = Math.max(0, this.hygiene - hygieneDecay * multiplier);
+                    this.social = Math.max(0, this.social - socialDecay * multiplier);
+                    this.curiosity = Math.max(0, this.curiosity - curiosityDecay * multiplier);
+                }
+                
+                if (this.hunger < 20 || this.hygiene < 15) {
+                    if (Math.random() < 0.05) {
+                        this.isSick = true;
+                        game.addMessage("I DON'T FEEL SO GOOD... 🤒");
+                    }
+                }
+                
+                if (this.hunger < 15 && Math.random() < 0.1) {
+                    game.notify("⚠️ YOUR PET IS STARVING!");
+                }
+                if (this.happiness < 15 && Math.random() < 0.1) {
+                    game.notify("⚠️ YOUR PET IS VERY UNHAPPY!");
+                }
+            }
+        }
+        
+        class Game {
+            constructor() {
+                this.pet = null;
+                this.canvas = document.getElementById('petCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.lastUpdate = Date.now();
+                this.timeOfDay = "day";
+                
+                // Mini-game state
+                this.currentMiniGame = null;
+                this.miniGameInterval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                const saved = localStorage.getItem('petteomocha_save_90s');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        this.pet = Object.assign(new Pet(), data);
+                        this.addMessage("WELCOME BACK! I MISSED YOU! 💕");
+                    } catch (e) {
+                        this.pet = new Pet();
+                    }
+                } else {
+                    this.pet = new Pet();
+                    this.addMessage("A NEW EGG HAS APPEARED! TAKE GOOD CARE OF IT! 🥚");
+                }
+                
+                this.updateUI();
+                this.startGameLoop();
+            }
+            
+            startGameLoop() {
+                setInterval(() => {
+                    this.pet.updateAge();
+                    this.pet.decay();
+                    this.pet.updateMood();
+                    this.updateUI();
+                    this.updateTimeOfDay();
+                    this.drawPet();
+                    
+                    if (Date.now() - this.lastUpdate > 60000) {
+                        this.saveGame(true);
+                        this.lastUpdate = Date.now();
+                    }
+                }, 5000);
+                
+                const animate = () => {
+                    this.drawPet();
+                    requestAnimationFrame(animate);
+                };
+                animate();
+            }
+            
+            updateTimeOfDay() {
+                const hour = new Date().getHours();
+                if (hour >= 6 && hour < 18) this.timeOfDay = "day";
+                else if (hour >= 18 && hour < 21) this.timeOfDay = "evening";
+                else this.timeOfDay = "night";
+                
+                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const icon = this.timeOfDay === "day" ? "☀️" : this.timeOfDay === "evening" ? "🌅" : "🌙";
+                document.getElementById('timeDisplay').textContent = `${icon} ${time}`;
+            }
+            
+            updateUI() {
+                document.getElementById('petName').textContent = this.pet.name;
+                document.getElementById('petAge').textContent = `AGE: ${this.pet.age} DAYS`;
+                document.getElementById('petStage').textContent = this.pet.stage.toUpperCase();
+                
+                this.updateStatBar('hunger', this.pet.hunger);
+                this.updateStatBar('energy', this.pet.energy);
+                this.updateStatBar('happiness', this.pet.happiness);
+                this.updateStatBar('hygiene', this.pet.hygiene);
+                this.updateStatBar('social', this.pet.social);
+                this.updateStatBar('curiosity', this.pet.curiosity);
+                
+                const moodEmojis = {
+                    happy: "😊",
+                    excited: "🤩",
+                    playful: "😄",
+                    tired: "😴",
+                    hungry: "😋",
+                    sad: "😢",
+                    lonely: "😔",
+                    dirty: "🤢",
+                    sick: "🤒",
+                    sleeping: "💤"
+                };
+                document.getElementById('moodDisplay').textContent = 
+                    `${moodEmojis[this.pet.mood]} ${this.pet.mood.toUpperCase()}`;
+                
+                let badgeText = this.pet.stage.toUpperCase();
+                if (this.pet.evolutionForm) {
+                    badgeText = `${this.pet.evolutionForm} (${badgeText})`;
+                } else if (this.pet.evolutionPath) {
+                    badgeText += ` - ${this.pet.evolutionPath} PATH`;
+                }
+                document.getElementById('evolutionBadge').textContent = badgeText;
+                
+                const traitsDiv = document.getElementById('personalityTraits');
+                traitsDiv.innerHTML = this.pet.traits.map(t => 
+                    `<span class="trait-badge">${t}</span>`
+                ).join('');
+            }
+            
+            updateStatBar(stat, value) {
+                const bar = document.getElementById(`${stat}Bar`);
+                const label = document.getElementById(`${stat}Value`);
+                bar.style.width = `${Math.max(0, Math.min(100, value))}%`;
+                label.textContent = Math.round(value);
+                
+                if (value < 20) {
+                    label.classList.add('critical');
+                } else {
+                    label.classList.remove('critical');
+                }
+            }
+            
+            drawPet() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                
+                ctx.clearRect(0, 0, w, h);
+                
+                const bgColors = {
+                    day: ['#1a3a52', '#2d5f7e'],
+                    evening: ['#4a3a2a', '#6b5a3a'],
+                    night: ['#0a0a1a', '#1a1a3a']
+                };
+                const [color1, color2] = bgColors[this.timeOfDay];
+                const gradient = ctx.createLinearGradient(0, 0, w, h);
+                gradient.addColorStop(0, color1);
+                gradient.addColorStop(1, color2);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, w, h);
+                
+                this.pet.animationFrame += this.pet.animationSpeed;
+                const bounce = Math.sin(this.pet.animationFrame) * 5;
+                
+                ctx.save();
+                ctx.translate(w/2, h/2);
+                
+                switch(this.pet.stage) {
+                    case "egg":
+                        this.drawEgg(ctx, bounce);
+                        break;
+                    case "baby":
+                        this.drawBaby(ctx, bounce);
+                        break;
+                    case "child":
+                        this.drawChild(ctx, bounce);
+                        break;
+                    case "teen":
+                        this.drawTeen(ctx, bounce);
+                        break;
+                    case "adult":
+                        this.drawAdult(ctx, bounce);
+                        break;
+                }
+                
+                ctx.restore();
+            }
+            
+            drawEgg(ctx, bounce) {
+                ctx.fillStyle = '#f0f0f0';
+                ctx.beginPath();
+                ctx.ellipse(0, bounce, 40, 50, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#d0d0d0';
+                ctx.beginPath();
+                ctx.arc(-15, bounce - 10, 8, 0, Math.PI * 2);
+                ctx.arc(10, bounce + 5, 6, 0, Math.PI * 2);
+                ctx.arc(-5, bounce + 15, 7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (this.pet.age > 0) {
+                    ctx.strokeStyle = '#888';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(-10, bounce - 20);
+                    ctx.lineTo(0, bounce - 10);
+                    ctx.lineTo(10, bounce - 15);
+                    ctx.stroke();
+                }
+            }
+            
+            drawBaby(ctx, bounce) {
+                ctx.fillStyle = this.getPetColor();
+                ctx.beginPath();
+                ctx.arc(0, bounce, 35, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(-12, bounce - 5, 5, 0, Math.PI * 2);
+                ctx.arc(12, bounce - 5, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (this.pet.mood === "happy" || this.pet.mood === "excited") {
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, bounce + 5, 10, 0, Math.PI);
+                    ctx.stroke();
+                } else if (this.pet.mood === "sad") {
+                    ctx.beginPath();
+                    ctx.arc(0, bounce + 15, 10, Math.PI, 0);
+                    ctx.stroke();
+                }
+                
+                ctx.strokeStyle = this.getPetColor();
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(-20, bounce - 25);
+                ctx.lineTo(-15, bounce - 35);
+                ctx.moveTo(20, bounce - 25);
+                ctx.lineTo(15, bounce - 35);
+                ctx.stroke();
+                
+                ctx.fillStyle = this.getPetColor();
+                ctx.beginPath();
+                ctx.arc(-15, bounce - 35, 4, 0, Math.PI * 2);
+                ctx.arc(15, bounce - 35, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            drawChild(ctx, bounce) {
+                ctx.fillStyle = this.getPetColor();
+                ctx.beginPath();
+                ctx.ellipse(0, bounce, 40, 45, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = this.getPetColor();
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.moveTo(-30, bounce);
+                ctx.lineTo(-45, bounce + 10);
+                ctx.moveTo(30, bounce);
+                ctx.lineTo(45, bounce + 10);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(-15, bounce - 10, 8, 0, Math.PI * 2);
+                ctx.arc(15, bounce - 10, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(-15, bounce - 10, 4, 0, Math.PI * 2);
+                ctx.arc(15, bounce - 10, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                if (this.pet.mood === "happy" || this.pet.mood === "excited") {
+                    ctx.arc(0, bounce + 10, 12, 0, Math.PI);
+                } else if (this.pet.mood === "sad") {
+                    ctx.arc(0, bounce + 20, 12, Math.PI, 0);
+                } else {
+                    ctx.moveTo(-10, bounce + 10);
+                    ctx.lineTo(10, bounce + 10);
+                }
+                ctx.stroke();
+            }
+            
+            drawTeen(ctx, bounce) {
+                ctx.fillStyle = this.getPetColor();
+                ctx.beginPath();
+                ctx.ellipse(0, bounce + 5, 38, 48, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(0, bounce - 30, 30, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = this.getPetColor();
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.moveTo(-25, bounce + 10);
+                ctx.lineTo(-40, bounce + 25);
+                ctx.moveTo(25, bounce + 10);
+                ctx.lineTo(40, bounce + 25);
+                ctx.moveTo(-15, bounce + 40);
+                ctx.lineTo(-15, bounce + 60);
+                ctx.moveTo(15, bounce + 40);
+                ctx.lineTo(15, bounce + 60);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(-12, bounce - 32, 9, 0, Math.PI * 2);
+                ctx.arc(12, bounce - 32, 9, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(-12, bounce - 32, 5, 0, Math.PI * 2);
+                ctx.arc(12, bounce - 32, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                if (this.pet.mood === "happy" || this.pet.mood === "excited") {
+                    ctx.arc(0, bounce - 20, 10, 0, Math.PI);
+                } else {
+                    ctx.moveTo(-8, bounce - 20);
+                    ctx.lineTo(8, bounce - 20);
+                }
+                ctx.stroke();
+            }
+            
+            drawAdult(ctx, bounce) {
+                const form = this.pet.evolutionForm || "HARMONIOUS";
+                
+                ctx.fillStyle = this.getPetColor();
+                ctx.beginPath();
+                ctx.ellipse(0, bounce + 10, 42, 52, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(0, bounce - 35, 35, 0, Math.PI * 2);
+                ctx.fill();
+                
+                switch(form) {
+                    case "SCHOLAR":
+                        ctx.strokeStyle = '#333';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(-15, bounce - 35, 12, 0, Math.PI * 2);
+                        ctx.arc(15, bounce - 35, 12, 0, Math.PI * 2);
+                        ctx.moveTo(-3, bounce - 35);
+                        ctx.lineTo(3, bounce - 35);
+                        ctx.stroke();
+                        break;
+                    case "SOCIAL BUTTERFLY":
+                        ctx.fillStyle = 'rgba(255, 182, 193, 0.6)';
+                        ctx.beginPath();
+                        ctx.ellipse(-35, bounce, 25, 35, -0.3, 0, Math.PI * 2);
+                        ctx.ellipse(35, bounce, 25, 35, 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                    case "ADVENTURER":
+                        ctx.fillStyle = '#ff6b6b';
+                        ctx.beginPath();
+                        ctx.ellipse(0, bounce - 50, 30, 8, 0, 0, Math.PI);
+                        ctx.fill();
+                        break;
+                    case "ARTIST":
+                        ctx.fillStyle = '#9b59b6';
+                        ctx.beginPath();
+                        ctx.ellipse(0, bounce - 55, 25, 10, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                }
+                
+                ctx.strokeStyle = this.getPetColor();
+                ctx.lineWidth = 12;
+                ctx.beginPath();
+                ctx.moveTo(-30, bounce + 15);
+                ctx.lineTo(-48, bounce + 30);
+                ctx.moveTo(30, bounce + 15);
+                ctx.lineTo(48, bounce + 30);
+                ctx.moveTo(-18, bounce + 50);
+                ctx.lineTo(-18, bounce + 75);
+                ctx.moveTo(18, bounce + 50);
+                ctx.lineTo(18, bounce + 75);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(-15, bounce - 37, 10, 0, Math.PI * 2);
+                ctx.arc(15, bounce - 37, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(-15, bounce - 37, 6, 0, Math.PI * 2);
+                ctx.arc(15, bounce - 37, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(0, bounce - 20, 15, 0, Math.PI);
+                ctx.stroke();
+            }
+            
+            getPetColor() {
+                if (this.pet.evolutionForm === "SCHOLAR") return '#6c5ce7';
+                if (this.pet.evolutionForm === "SOCIAL BUTTERFLY") return '#fd79a8';
+                if (this.pet.evolutionForm === "ADVENTURER") return '#00b894';
+                if (this.pet.evolutionForm === "ARTIST") return '#fdcb6e';
+                if (this.pet.evolutionForm === "MYSTERIOUS") return '#2d3436';
+                
+                const colors = {
+                    egg: '#f0f0f0',
+                    baby: '#74b9ff',
+                    child: '#a29bfe',
+                    teen: '#fd79a8',
+                    adult: '#6c5ce7'
+                };
+                return colors[this.pet.stage] || '#74b9ff';
+            }
+            
+            feed() {
+                if (this.pet.stage === "egg") {
+                    this.addMessage("THE EGG DOESN'T NEED FOOD YET!");
+                    return;
+                }
+                
+                let amount = 30;
+                if (this.pet.hasTrait("PICKY EATER")) {
+                    amount -= 10;
+                    this.addMessage("HMM, I GUESS THIS IS OKAY... 😐");
+                } else if (this.pet.hasTrait("FOODIE")) {
+                    amount += 10;
+                    this.addMessage("YUM! THIS IS DELICIOUS! 😋");
+                } else {
+                    this.addMessage("THANKS FOR THE FOOD! 🍖");
+                }
+                
+                this.pet.hunger = Math.min(100, this.pet.hunger + amount);
+                this.pet.happiness = Math.min(100, this.pet.happiness + 10);
+                
+                if (this.pet.isSick && Math.random() < 0.3) {
+                    this.pet.isSick = false;
+                    this.addMessage("I FEEL BETTER NOW! 💚");
+                }
+                
+                this.updateUI();
+                this.saveGame(true);
+            }
+            
+            play() {
+                if (this.pet.stage === "egg") {
+                    this.addMessage("THE EGG WIGGLES HAPPILY! 🥚");
+                    this.pet.happiness = Math.min(100, this.pet.happiness + 5);
+                    this.updateUI();
+                    return;
+                }
+                
+                if (this.pet.energy < 15) {
+                    this.addMessage("I'M TOO TIRED TO PLAY... 😴");
+                    return;
+                }
+                
+                let happinessGain = 20;
+                let energyCost = 15;
+                
+                if (this.pet.hasTrait("ENERGETIC")) {
+                    happinessGain += 10;
+                    this.addMessage("YAY! LET'S PLAY MORE! 🎮");
+                } else if (this.pet.hasTrait("LAZY")) {
+                    happinessGain -= 5;
+                    energyCost += 5;
+                    this.addMessage("OKAY, BUT JUST FOR A BIT... 😅");
+                } else {
+                    const messages = [
+                        "THIS IS SO FUN! 🎉",
+                        "I LOVE PLAYING WITH YOU! 💕",
+                        "BEST DAY EVER! 🌟",
+                        "AGAIN! AGAIN! 🤩"
+                    ];
+                    this.addMessage(messages[Math.floor(Math.random() * messages.length)]);
+                }
+                
+                this.pet.happiness = Math.min(100, this.pet.happiness + happinessGain);
+                this.pet.energy = Math.max(0, this.pet.energy - energyCost);
+                this.pet.social = Math.min(100, this.pet.social + 10);
+                this.pet.creativity += 0.5;
+                
+                this.updateUI();
+                this.saveGame(true);
+            }
+            
+            clean() {
+                if (this.pet.stage === "egg") {
+                    this.addMessage("THE EGG IS ALREADY CLEAN!");
+                    return;
+                }
+                
+                let amount = 50;
+                if (this.pet.hasTrait("NEAT FREAK")) {
+                    amount += 20;
+                    this.addMessage("FINALLY! I WAS SO DIRTY! 🛁");
+                } else {
+                    this.addMessage("ALL CLEAN! THANKS! ✨");
+                }
+                
+                this.pet.hygiene = Math.min(100, this.pet.hygiene + amount);
+                this.pet.happiness = Math.min(100, this.pet.happiness + 10);
+                
+                if (this.pet.isSick && Math.random() < 0.4) {
+                    this.pet.isSick = false;
+                    this.addMessage("I'M FEELING BETTER! 💚");
+                }
+                
+                this.updateUI();
+                this.saveGame(true);
+            }
+            
+            sleep() {
+                if (this.pet.stage === "egg") {
+                    this.addMessage("THE EGG IS RESTING... 😴");
+                    return;
+                }
+                
+                if (this.pet.isSleeping) {
+                    this.pet.isSleeping = false;
+                    this.addMessage("GOOD MORNING! REFRESHED! 😊");
+                } else {
+                    this.pet.isSleeping = true;
+                    this.addMessage("YAWN... GOODNIGHT! 😴");
+                    
+                    setTimeout(() => {
+                        if (this.pet.isSleeping) {
+                            this.pet.energy = Math.min(100, this.pet.energy + 50);
+                            this.pet.isSleeping = false;
+                            this.addMessage("THAT WAS A GOOD NAP! 🌟");
+                            this.updateUI();
+                            this.saveGame(true);
+                        }
+                    }, 30000);
+                }
+                
+                this.updateUI();
+                this.saveGame(true);
+            }
+            
+            talk() {
+                if (this.pet.stage === "egg") {
+                    this.addMessage("...");
+                    setTimeout(() => this.addMessage("*WIGGLE WIGGLE*"), 1000);
+                    return;
+                }
+                
+                this.pet.social = Math.min(100, this.pet.social + 15);
+                this.pet.affection += 0.5;
+                
+                const responses = this.generateTalkResponse();
+                this.addMessage(responses);
+                
+                this.updateUI();
+                this.saveGame(true);
+            }
+            
+            generateTalkResponse() {
+                const mood = this.pet.mood;
+                const stage = this.pet.stage;
+                
+                const responses = {
+                    baby: {
+                        happy: ["GOO GOO! 👶", "HEHE! 😊", "*HAPPY BABY NOISES*"],
+                        hungry: ["WAAAH! 🍼", "FEED ME! 😢"],
+                        tired: ["ZZZ... 😴", "*YAWN*"],
+                        default: ["BABABA! 👶"]
+                    },
+                    child: {
+                        happy: ["I LOVE YOU! 💕", "LET'S PLAY!", "YOU'RE THE BEST!", "THIS IS FUN! 🎉"],
+                        sad: ["I'M SAD... 😢", "CAN WE PLAY?", "I MISS YOU..."],
+                        hungry: ["I'M SO HUNGRY! 🍖", "CAN I HAVE A SNACK?"],
+                        playful: ["LET'S PLAY A GAME! 🎮", "CATCH ME!", "WHEEE! 🎊"],
+                        default: ["HI! HOW ARE YOU? 😊"]
+                    },
+                    teen: {
+                        happy: ["LIFE IS GOOD! 😎", "THANKS FOR CARING!", "GLAD WE'RE FRIENDS!"],
+                        sad: ["LEAVE ME ALONE... 😔", "YOU DON'T GET IT...", "WHATEVER..."],
+                        excited: ["THIS IS AWESOME! 🤩", "CAN'T WAIT TO EVOLVE!", "SO MUCH ENERGY!"],
+                        lonely: ["DO YOU CARE? 💔", "I FEEL ALONE...", "CAN WE HANG OUT?"],
+                        default: ["HEY. WHAT'S UP? 🙂"]
+                    },
+                    adult: {
+                        happy: ["THANK YOU FOR EVERYTHING. 💕", "I'VE GROWN SO MUCH!", "LIFE IS WONDERFUL!"],
+                        sad: ["EVEN ADULTS HAVE BAD DAYS... 😞", "I APPRECIATE YOU.", "IT WILL GET BETTER."],
+                        excited: ["I LOVE OUR TIME TOGETHER! 🌟", "EVERY DAY'S AN ADVENTURE!", "YOU MAKE ME HAPPY!"],
+                        lonely: ["I MISS OUR TALKS... 💭", "LET'S SPEND TIME TOGETHER.", "YOU MEAN EVERYTHING."],
+                        default: ["HOW CAN I HELP YOU? 😊"]
+                    }
+                };
+                
+                const stageResponses = responses[stage] || responses.child;
+                const moodResponses = stageResponses[mood] || stageResponses.default;
+                
+                return moodResponses[Math.floor(Math.random() * moodResponses.length)];
+            }
+            
+            train() {
+                if (this.pet.stage === "egg") {
+                    this.addMessage("CAN'T TRAIN AN EGG!");
+                    return;
+                }
+                
+                if (this.pet.energy < 20) {
+                    this.addMessage("TOO TIRED FOR TRAINING... 😴");
+                    return;
+                }
+                
+                this.pet.discipline = Math.min(100, this.pet.discipline + 10);
+                this.pet.intelligence = Math.min(100, this.pet.intelligence + 5);
+                this.pet.energy = Math.max(0, this.pet.energy - 25);
+                this.pet.curiosity = Math.min(100, this.pet.curiosity + 10);
+                
+                if (this.pet.hasTrait("STUBBORN")) {
+                    this.addMessage("FINE, I'LL DO IT... BUT I DON'T WANT TO! 😤");
+                } else if (this.pet.hasTrait("CURIOUS")) {
+                    this.addMessage("OOH, LEARNING SO MUCH! 🎯");
+                } else {
+                    this.addMessage("TRAINING IS TOUGH BUT GOOD! 💪");
+                }
+                
+                this.updateUI();
+                this.saveGame(true);
+            }
+            
+            // Mini-Games
+            
+            startMemoryGame() {
+                this.currentMiniGame = 'memory';
+                document.getElementById('memoryGame').classList.add('active');
+                
+                // Initialize memory game
+                this.initMemoryGame();
+            }
+            
+            initMemoryGame() {
+                const memoryGrid = document.getElementById('memoryGrid');
+                memoryGrid.innerHTML = '';
+                
+                const symbols = ['🐾', '🌟', '💖', '⚡', '🎮', '🛁', '🎯', '💬'];
+                const cards = [...symbols, ...symbols];
+                
+                // Shuffle cards
+                for (let i = cards.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [cards[i], cards[j]] = [cards[j], cards[i]];
+                }
+                
+                // Create card elements
+                cards.forEach((symbol, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card';
+                    card.dataset.symbol = symbol;
+                    card.dataset.index = index;
+                    card.textContent = '?';
+                    card.addEventListener('click', () => this.flipMemoryCard(card));
+                    memoryGrid.appendChild(card);
+                });
+                
+                // Reset game state
+                this.memoryState = {
+                    flippedCards: [],
+                    matchedPairs: 0,
+                    score: 0,
+                    timeLeft: 60
+                };
+                
+                // Update UI
+                document.getElementById('memoryTime').textContent = this.memoryState.timeLeft;
+                document.getElementById('memoryPairs').textContent = this.memoryState.matchedPairs;
+                document.getElementById('memoryScore').textContent = this.memoryState.score;
+                
+                // Start timer
+                this.miniGameInterval = setInterval(() => {
+                    this.memoryState.timeLeft--;
+                    document.getElementById('memoryTime').textContent = this.memoryState.timeLeft;
+                    
+                    if (this.memoryState.timeLeft <= 0) {
+                        this.endMemoryGame(false);
+                    }
+                }, 1000);
+            }
+            
+            flipMemoryCard(card) {
+                if (card.classList.contains('flipped') || card.classList.contains('matched') || 
+                    this.memoryState.flippedCards.length >= 2) {
+                    return;
+                }
+                
+                card.classList.add('flipped');
+                card.textContent = card.dataset.symbol;
+                this.memoryState.flippedCards.push(card);
+                
+                if (this.memoryState.flippedCards.length === 2) {
+                    this.checkMemoryMatch();
+                }
+            }
+            
+            checkMemoryMatch() {
+                const [card1, card2] = this.memoryState.flippedCards;
+                
+                if (card1.dataset.symbol === card2.dataset.symbol) {
+                    // Match found
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    this.memoryState.matchedPairs++;
+                    this.memoryState.score += 100;
+                    
+                    document.getElementById('memoryPairs').textContent = this.memoryState.matchedPairs;
+                    document.getElementById('memoryScore').textContent = this.memoryState.score;
+                    
+                    if (this.memoryState.matchedPairs === 8) {
+                        this.endMemoryGame(true);
+                    }
+                } else {
+                    // No match
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        card1.textContent = '?';
+                        card2.textContent = '?';
+                    }, 1000);
+                }
+                
+                this.memoryState.flippedCards = [];
+            }
+            
+            endMemoryGame(won) {
+                clearInterval(this.miniGameInterval);
+                
+                if (won) {
+                    this.addMessage("WOW! YOU'RE A MEMORY MASTER! 🧠");
+                    this.pet.intelligence = Math.min(100, this.pet.intelligence + 15);
+                    this.pet.happiness = Math.min(100, this.pet.happiness + 10);
+                } else {
+                    this.addMessage("GOOD TRY! LET'S PLAY AGAIN SOON! 🎮");
+                    this.pet.intelligence = Math.min(100, this.pet.intelligence + 5);
+                }
+                
+                this.updateUI();
+                this.saveGame(true);
+                this.closeMiniGame();
+            }
+            
+            startReactionGame() {
+                this.currentMiniGame = 'reaction';
+                document.getElementById('reactionGame').classList.add('active');
+                
+                // Initialize reaction game
+                this.initReactionGame();
+            }
+            
+            initReactionGame() {
+                const target = document.getElementById('reactionTarget');
+                
+                // Reset game state
+                this.reactionState = {
+                    clicks: 0,
+                    score: 0,
+                    timeLeft: 30
+                };
+                
+                // Update UI
+                document.getElementById('reactionTime').textContent = this.reactionState.timeLeft;
+                document.getElementById('reactionClicks').textContent = this.reactionState.clicks;
+                document.getElementById('reactionScore').textContent = this.reactionState.score;
+                
+                // Move target randomly
+                this.moveReactionTarget();
+                
+                // Start timer
+                this.miniGameInterval = setInterval(() => {
+                    this.reactionState.timeLeft--;
+                    document.getElementById('reactionTime').textContent = this.reactionState.timeLeft;
+                    
+                    if (this.reactionState.timeLeft <= 0) {
+                        this.endReactionGame();
+                    }
+                }, 1000);
+                
+                // Add click listener
+                target.addEventListener('click', () => this.handleReactionClick());
+            }
+            
+            moveReactionTarget() {
+                const target = document.getElementById('reactionTarget');
+                const gameArea = target.parentElement;
+                
+                const maxX = gameArea.offsetWidth - target.offsetWidth;
+                const maxY = gameArea.offsetHeight - target.offsetHeight;
+                
+                const randomX = Math.floor(Math.random() * maxX);
+                const randomY = Math.floor(Math.random() * maxY);
+                
+                target.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            }
+            
+            handleReactionClick() {
+                this.reactionState.clicks++;
+                this.reactionState.score += 10;
+                
+                document.getElementById('reactionClicks').textContent = this.reactionState.clicks;
+                document.getElementById('reactionScore').textContent = this.reactionState.score;
+                
+                this.moveReactionTarget();
+            }
+            
+            endReactionGame() {
+                clearInterval(this.miniGameInterval);
+                
+                this.addMessage("GREAT REACTION TIME! ⚡");
+                this.pet.energy = Math.min(100, this.pet.energy + 15);
+                this.pet.happiness = Math.min(100, this.pet.happiness + 5);
+                
+                this.updateUI();
+                this.saveGame(true);
+                this.closeMiniGame();
+            }
+            
+            startMazeGame() {
+                this.currentMiniGame = 'maze';
+                document.getElementById('mazeGame').classList.add('active');
+                
+                // Initialize maze game
+                this.initMazeGame();
+            }
+            
+            initMazeGame() {
+                const mazeContainer = document.getElementById('mazeContainer');
+                mazeContainer.innerHTML = '';
+                
+                // Create a simple maze (10x10 grid)
+                const maze = this.generateMaze(10, 10);
+                
+                // Render maze
+                for (let y = 0; y < 10; y++) {
+                    for (let x = 0; x < 10; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'maze-cell';
+                        
+                        if (maze[y][x] === 1) {
+                            cell.classList.add('wall');
+                        } else if (x === 0 && y === 0) {
+                            cell.classList.add('player');
+                        } else if (x === 9 && y === 9) {
+                            cell.classList.add('exit');
+                        } else {
+                            cell.classList.add('path');
+                        }
+                        
+                        mazeContainer.appendChild(cell);
+                    }
+                }
+                
+                // Reset game state
+                this.mazeState = {
+                    playerX: 0,
+                    playerY: 0,
+                    moves: 0,
+                    timeLeft: 90
+                };
+                
+                // Update UI
+                document.getElementById('mazeTime').textContent = this.mazeState.timeLeft;
+                document.getElementById('mazeMoves').textContent = this.mazeState.moves;
+                
+                // Start timer
+                this.miniGameInterval = setInterval(() => {
+                    this.mazeState.timeLeft--;
+                    document.getElementById('mazeTime').textContent = this.mazeState.timeLeft;
+                    
+                    if (this.mazeState.timeLeft <= 0) {
+                        this.endMazeGame(false);
+                    }
+                }, 1000);
+                
+                // Add keyboard controls
+                document.addEventListener('keydown', (e) => this.handleMazeMove(e));
+            }
+            
+            generateMaze(width, height) {
+                // Simple maze generation - in a real game you'd use a proper algorithm
+                const maze = Array(height).fill().map(() => Array(width).fill(0));
+                
+                // Add some walls
+                for (let i = 0; i < 20; i++) {
+                    const x = Math.floor(Math.random() * width);
+                    const y = Math.floor(Math.random() * height);
+                    if (!(x === 0 && y === 0) && !(x === width-1 && y === height-1)) {
+                        maze[y][x] = 1;
+                    }
+                }
+                
+                // Ensure there's a path (simplified)
+                maze[0][1] = 0;
+                maze[1][1] = 0;
+                maze[1][0] = 0;
+                
+                return maze;
+            }
+            
+            handleMazeMove(e) {
+                if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                    return;
+                }
+                
+                e.preventDefault();
+                
+                let newX = this.mazeState.playerX;
+                let newY = this.mazeState.playerY;
+                
+                switch(e.key) {
+                    case 'ArrowUp': newY--; break;
+                    case 'ArrowDown': newY++; break;
+                    case 'ArrowLeft': newX--; break;
+                    case 'ArrowRight': newX++; break;
+                }
+                
+                // Check if move is valid
+                if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10) {
+                    const mazeContainer = document.getElementById('mazeContainer');
+                    const cellIndex = newY * 10 + newX;
+                    const cell = mazeContainer.children[cellIndex];
+                    
+                    if (!cell.classList.contains('wall')) {
+                        // Update player position
+                        const oldCellIndex = this.mazeState.playerY * 10 + this.mazeState.playerX;
+                        const oldCell = mazeContainer.children[oldCellIndex];
+                        
+                        oldCell.classList.remove('player');
+                        oldCell.classList.add('path');
+                        
+                        cell.classList.remove('path', 'exit');
+                        cell.classList.add('player');
+                        
+                        this.mazeState.playerX = newX;
+                        this.mazeState.playerY = newY;
+                        this.mazeState.moves++;
+                        
+                        document.getElementById('mazeMoves').textContent = this.mazeState.moves;
+                        
+                        // Check if player reached exit
+                        if (newX === 9 && newY === 9) {
+                            this.endMazeGame(true);
+                        }
+                    }
+                }
+            }
+            
+            endMazeGame(won) {
+                clearInterval(this.miniGameInterval);
+                document.removeEventListener('keydown', this.handleMazeMove);
+                
+                if (won) {
+                    this.addMessage("MASTER NAVIGATOR! YOU FOUND THE WAY! 🔍");
+                    this.pet.curiosity = Math.min(100, this.pet.curiosity + 15);
+                    this.pet.happiness = Math.min(100, this.pet.happiness + 10);
+                } else {
+                    this.addMessage("MAZES CAN BE TRICKY! TRY AGAIN! 🗺️");
+                    this.pet.curiosity = Math.min(100, this.pet.curiosity + 5);
+                }
+                
+                this.updateUI();
+                this.saveGame(true);
+                this.closeMiniGame();
+            }
+            
+            startRhythmGame() {
+                this.currentMiniGame = 'rhythm';
+                document.getElementById('rhythmGame').classList.add('active');
+                
+                // Initialize rhythm game
+                this.initRhythmGame();
+            }
+            
+            initRhythmGame() {
+                const rhythmTrack = document.getElementById('rhythmTrack');
+                rhythmTrack.innerHTML = '<div class="rhythm-line"></div><div class="rhythm-hit-area"></div>';
+                
+                // Reset game state
+                this.rhythmState = {
+                    score: 0,
+                    combo: 0,
+                    timeLeft: 45,
+                    notes: []
+                };
+                
+                // Update UI
+                document.getElementById('rhythmTime').textContent = this.rhythmState.timeLeft;
+                document.getElementById('rhythmScore').textContent = this.rhythmState.score;
+                document.getElementById('rhythmCombo').textContent = this.rhythmState.combo;
+                
+                // Start generating notes
+                this.generateRhythmNote();
+                this.noteInterval = setInterval(() => {
+                    if (Math.random() < 0.7) {
+                        this.generateRhythmNote();
+                    }
+                }, 1000);
+                
+                // Start timer
+                this.miniGameInterval = setInterval(() => {
+                    this.rhythmState.timeLeft--;
+                    document.getElementById('rhythmTime').textContent = this.rhythmState.timeLeft;
+                    
+                    if (this.rhythmState.timeLeft <= 0) {
+                        this.endRhythmGame();
+                    }
+                }, 1000);
+                
+                // Add keyboard listener
+                document.addEventListener('keydown', (e) => this.handleRhythmInput(e));
+            }
+            
+            generateRhythmNote() {
+                const rhythmTrack = document.getElementById('rhythmTrack');
+                const note = document.createElement('div');
+                note.className = 'rhythm-note';
+                note.style.left = '400px';
+                rhythmTrack.appendChild(note);
+                
+                this.rhythmState.notes.push({
+                    element: note,
+                    x: 400,
+                    hit: false
+                });
+                
+                this.moveRhythmNotes();
+            }
+            
+            moveRhythmNotes() {
+                this.rhythmState.notes.forEach((note, index) => {
+                    note.x -= 5;
+                    note.element.style.left = `${note.x}px`;
+                    
+                    // Remove notes that go off screen
+                    if (note.x < -30) {
+                        note.element.remove();
+                        this.rhythmState.notes.splice(index, 1);
+                        
+                        if (!note.hit) {
+                            this.rhythmState.combo = 0;
+                            document.getElementById('rhythmCombo').textContent = this.rhythmState.combo;
+                        }
+                    }
+                });
+                
+                if (this.rhythmState.timeLeft > 0) {
+                    requestAnimationFrame(() => this.moveRhythmNotes());
+                }
+            }
+            
+            handleRhythmInput(e) {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    
+                    // Check if any note is in hit area (50px - 110px)
+                    let hit = false;
+                    this.rhythmState.notes.forEach(note => {
+                        if (note.x >= 50 && note.x <= 110 && !note.hit) {
+                            note.hit = true;
+                            note.element.style.background = '#00ff00';
+                            hit = true;
+                            
+                            this.rhythmState.score += 10 * (this.rhythmState.combo + 1);
+                            this.rhythmState.combo++;
+                            
+                            document.getElementById('rhythmScore').textContent = this.rhythmState.score;
+                            document.getElementById('rhythmCombo').textContent = this.rhythmState.combo;
+                        }
+                    });
+                    
+                    if (!hit) {
+                        this.rhythmState.combo = 0;
+                        document.getElementById('rhythmCombo').textContent = this.rhythmState.combo;
+                    }
+                }
+            }
+            
+            endRhythmGame() {
+                clearInterval(this.miniGameInterval);
+                clearInterval(this.noteInterval);
+                document.removeEventListener('keydown', this.handleRhythmInput);
+                
+                this.addMessage("AMAZING RHYTHM! YOU'VE GOT THE BEAT! 🎵");
+                this.pet.creativity = Math.min(100, this.pet.creativity + 15);
+                this.pet.happiness = Math.min(100, this.pet.happiness + 10);
+                
+                this.updateUI();
+                this.saveGame(true);
+                this.closeMiniGame();
+            }
+            
+            closeMiniGame() {
+                // Clear any intervals
+                if (this.miniGameInterval) {
+                    clearInterval(this.miniGameInterval);
+                }
+                if (this.noteInterval) {
+                    clearInterval(this.noteInterval);
+                }
+                
+                // Remove event listeners
+                document.removeEventListener('keydown', this.handleMazeMove);
+                document.removeEventListener('keydown', this.handleRhythmInput);
+                
+                // Hide all game screens
+                document.querySelectorAll('.game-screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                this.currentMiniGame = null;
+            }
+            
+            addMessage(text) {
+                const chatPanel = document.getElementById('chatPanel');
+                const message = document.createElement('div');
+                message.className = 'chat-message pet';
+                message.textContent = text;
+                chatPanel.appendChild(message);
+                chatPanel.scrollTop = chatPanel.scrollHeight;
+                
+                while (chatPanel.children.length > 10) {
+                    chatPanel.removeChild(chatPanel.firstChild);
+                }
+            }
+            
+            notify(text) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = text;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 4000);
+            }
+            
+            showModal(title, content) {
+                const modal = document.getElementById('modal');
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = `
+                    <h2>${title}</h2>
+                    <p>${content}</p>
+                    <button class="action-btn" onclick="game.closeModal()" style="color: #00ff00; margin-top: 20px;">AWESOME! 🎉</button>
+                `;
+                modal.classList.add('active');
+            }
+            
+            closeModal() {
+                document.getElementById('modal').classList.remove('active');
+            }
+            
+            showStats() {
+                const stats = `
+                    <h2>📊 DETAILED STATS</h2>
+                    <div style="text-align: left; margin: 20px 0;">
+                        <h3 style="color: #ff00ff; font-size: 0.7em; margin: 15px 0;">HIDDEN STATS:</h3>
+                        <p>🎓 DISCIPLINE: ${Math.round(this.pet.discipline)}</p>
+                        <p>💝 AFFECTION: ${Math.round(this.pet.affection)}</p>
+                        <p>🧠 INTELLIGENCE: ${Math.round(this.pet.intelligence)}</p>
+                        <p>🎨 CREATIVITY: ${Math.round(this.pet.creativity)}</p>
+                        <p>🦅 INDEPENDENCE: ${Math.round(this.pet.independence)}</p>
+                        <br>
+                        <h3 style="color: #ff00ff; font-size: 0.7em; margin: 15px 0;">STATUS:</h3>
+                        <p>🌟 STAGE: ${this.pet.stage.toUpperCase()}</p>
+                        <p>📅 AGE: ${this.pet.age} DAYS</p>
+                        ${this.pet.evolutionPath ? `<p>🔀 PATH: ${this.pet.evolutionPath}</p>` : ''}
+                        ${this.pet.evolutionForm ? `<p>✨ FORM: ${this.pet.evolutionForm}</p>` : ''}
+                        <p>😊 MOOD: ${this.pet.mood.toUpperCase()}</p>
+                        <p>🎭 TRAITS: ${this.pet.traits.join(', ')}</p>
+                    </div>
+                `;
+                document.getElementById('modalContent').innerHTML = stats + 
+                    '<button class="action-btn" onclick="game.closeModal()" style="color: #00ff00;">CLOSE</button>';
+                document.getElementById('modal').classList.add('active');
+            }
+            
+            saveGame(silent = false) {
+                try {
+                    const saveData = JSON.stringify(this.pet);
+                    localStorage.setItem('petteomocha_save_90s', saveData);
+                    if (!silent) {
+                        this.notify("💾 GAME SAVED!");
+                    }
+                } catch (e) {
+                    this.notify("❌ FAILED TO SAVE!");
+                }
+            }
+            
+            resetGame() {
+                if (confirm("START OVER WITH A NEW PET? THIS CANNOT BE UNDONE!")) {
+                    localStorage.removeItem('petteomocha_save_90s');
+                    location.reload();
+                }
+            }
+        }
+        
+        const game = new Game();
+        
+        window.addEventListener('beforeunload', (e) => {
+            game.saveGame(true);
+        });
+    </script>
+</body>
+</html>
